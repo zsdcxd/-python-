@@ -6,14 +6,18 @@ def add(l):
 
 
 def minus(l):
-    t = 0
+    t = 2 * int(l[0])
     for i in l:
-        t -= i
-    return int(i)
+        t -= int(i)
+    return t
 
 
 def main(l):
     l = l.split('+')
+    n=0
+    for i in l:
+        l[n] = minus(i.split('-'))
+        n += 1
     out = add(l)
     print(out)
     return out
