@@ -12,6 +12,13 @@ def minus(l):
     return t
 
 
+def brackets(l):
+    n = 0
+    while True:
+        while l[n] == '(' or l[n] == '（' :
+            start = n
+
+
 def main(l):
     l = l.split('+')
     n=0
@@ -23,5 +30,3 @@ def main(l):
     return out
 
 
-text = input('text')
-main(text)
