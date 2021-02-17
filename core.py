@@ -10,7 +10,6 @@ def log(func):
     def wrapper(*args, **kwargs):
         logging.debug('call %s(%s): ' % (func.__name__, args))
         return func(*args, **kwargs)
-
     return wrapper
 
 
@@ -78,9 +77,10 @@ def core(l):
         l[n] = minus(m.split('-'))
         n += 1
     out = str(add(l))
-    print(out)
+    logging.info('out:%s' % out)
     return out
 
 
-test = input('test') or '1-((1+1)+(2-3))'
+test = input('test') or '1-（（1+2-3）-（1-2）+1-（2+1））'
 core(test)
+
