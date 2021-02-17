@@ -64,7 +64,7 @@ def brackets(l):
         else:
             return l[: start] + core(l[start + 1: end]) + l[end + 1:]
     else:
-        return l
+        return str(l)
 
 
 @log
@@ -72,10 +72,15 @@ def core(l):
     l = brackets(l)
     logging.info('brackets(l):%s' % l)
     l = l.split('+')
-    n = 0
+    n1 = 0
     for m in l:
-        l[n] = minus(m.split('-'))
-        n += 1
+        n2 = 0
+        m = m.split(('--'))
+        for s in m:
+            m[n2] = minus(s.split('-'))
+            n2 += 1
+        l[n1] = add(m)
+        n1 += 1
     out = str(add(l))
     logging.info('out:%s' % out)
     return out
@@ -83,4 +88,3 @@ def core(l):
 
 test = input('test') or '1-（（1+2-3）-（1-2）+1-（2+1））'
 core(test)
-
