@@ -86,5 +86,5 @@ def core(l):
     return out
 
 
-test = input('test') or '1-（（1+2-3）-（1-2）+1-（2+1））'
-core(test)
+# test = input('test') or '0'
+# core(test)
