@@ -1,5 +1,6 @@
+import functools
+import logging
 from functools import reduce
-import logging, functools
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -83,7 +84,3 @@ def core(l):
 
 test = input('test') or '1-((1+1)+(2-3))'
 core(test)
-# # s = '0'
-# n = int(s)
-# logging.info('n = %d' % n)
-# print(10 / n)
