@@ -1,6 +1,6 @@
 import logging
 from functools import reduce, wraps
-from math import sin, cos, tan, asin, acos, atan
+from math import sin, cos, tan, asin, acos, atan, pi
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -50,10 +50,12 @@ class basicf(object):
         if self.b in self.alg:
             variable += ','
             variable += self.b
-            return reduce(eval('lambda %s: %s' % (variable, self.alg)), [int(i) if bool(i) else self.times for i in l])
+            return reduce(eval('lambda %s: %s' % (variable, self.alg)),
+                          [int(i) if bool(i) else self.times for i in l])
         elif l:
             out = list(
-                map(eval('lambda %s: %s' % (variable, self.alg)), [int(i) if bool(i) else self.times for i in l]))
+                map(eval('lambda %s: %s' % (variable, self.alg)),
+                    [int(i) if bool(i) else self.times for i in l]))
             return out[0]
 
     def splt(self, l):
@@ -72,24 +74,17 @@ class basicf(object):
         return splittedlist
 
 
-class trigf(object):
-
-    def __init__(self, alg, a='x'):
-        self.alg = alg
-        self.a = a
-
-    def f(self, l):
-        pass
-
-
 add = basicf('a+b', ['+', '+'], 0)
 minus = basicf('a-b', ['-', '-'], 0)
 multiply = basicf('a*b', ['*', '×'], 0)
 divide = basicf('a/b', ['/', '÷'], 0)
 sqroot = basicf('a**0.5', ['√'], 0)
 power = basicf('a**b', ['**', '^'], 0)
+sinc = basicf('sina', ['sin'], 0)
+cosc = basicf('cosa', ['cos'], 0)
+tanc = basicf('tana', ['tan'], 0)
 
-
+print(sinc.f([pi/2]))
 @log
 def brackets(l):
     start = min(l.find('(') if l.find('(') != -1 and l.find('（') != -1 else max(l.find('('), l.find('（')),
@@ -165,7 +160,6 @@ def core(l='0'):
     logging.debug('out:%s' % out)
     return out
 
-
 #
-# test = input('test') or '(1-2**3)×(2+3-(2-1))/(√4)'
+# test = input('test') or '(1-2**3)×(2+3-(2*sin(pi())-1))/(√4)'
 # core(test)
