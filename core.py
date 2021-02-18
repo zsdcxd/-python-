@@ -17,18 +17,35 @@ def log(func):
 # ######################################################################################################################
 #
 # 你们怎么一个劲长个子
-#                 ,___.、
-#               |||————||//|
-#               丨눈  눈 |||
-#                乀  -  丿      ←wdq
+#               ,___.、
+#             |||————||//|
+#             丨눈  눈 |||
+#              乀  -  丿
+#         ／            (((ヽ
+#        (　 ﾉ　　 　　 ￣Ｙ＼
+#        |　(＼　         ｜    )
+#         ヽ　ヽ`  _     ノ    /
+# 　         ＼ |　⌒Ｙ⌒　/  /
+# 　        ｜ヽ   · ｜  ·  ﾉ/
+#          　｜＼トー仝ーイ  /
+# 　　       ｜    ミ土彡  /
+#           ) \     °   /
+#          (   \   y     \
+#          /     /  \ \   \
+#        /  /   /      \
+#       ( (    ).       ) ).  )
+#      (      ).         ( |  |
+#       |    /            \   |
+#     nn.   ).             （. nn.
 
 
 class basicf(object):
 
-    def __init__(self, alg, symbol, a='a', b='b', quickalg=None):
+    def __init__(self, alg, symbol, times, a='a', b='b', quickalg=None):
         self.alg = quickalg or alg
         self.a = a
         self.b = b
+        self.times = times
         self.symbol = symbol
 
     def f(self, l):
@@ -36,7 +53,11 @@ class basicf(object):
         if self.b in self.alg:
             variable += ','
             variable += self.b
-        return reduce(eval('lambda %s: %s' % (variable, self.alg)), [int(i) if bool(i) else 0 for i in l])
+            return reduce(eval('lambda %s: %s' % (variable, self.alg)), [int(i) if bool(i) else self.times for i in l])
+        elif l:
+            out = list(
+                map(eval('lambda %s: %s' % (variable, self.alg)), [int(i) if bool(i) else self.times for i in l]))
+            return out[0]
 
     def splt(self, l):
         symbollist = self.symbol
@@ -63,11 +84,13 @@ class trigf(object):
         pass
 
 
-add = basicf('a+b', ['+', '+'])
-minus = basicf('a-b', ['-', '-'])
-multiply = basicf('a*b', ['*', '×'])
-divide = basicf('a/b', ['/', '÷'])
-sqroot = basicf('a**0.5', ['√'])
+add = basicf('a+b', ['+', '+'], 0)
+minus = basicf('a-b', ['-', '-'], 0)
+multiply = basicf('a*b', ['*', '×'], 0)
+divide = basicf('a/b', ['/', '÷'], 0)
+sqroot = basicf('a**0.5', ['√'], 0)
+power = basicf('a**b', ['**', '^'], 0)
+
 
 @log
 def brackets(l):
@@ -114,6 +137,9 @@ def core(l='0'):
                     lmultiply = []
                     for tobmultiplied in multiply.splt(tobdivided):
                         logging.debug('tobmultiplied:%s' % tobmultiplied)
+                        if '√' in tobmultiplied:
+                            for tobsqrooted in sqroot.splt(tobmultiplied):
+                                tobmultiplied = sqroot.f(tobsqrooted)
                         lmultiply.append(tobmultiplied)
                     logging.debug('lmultiply:%s' % lmultiply)
                     ldivide.append(multiply.f(lmultiply))
@@ -128,12 +154,6 @@ def core(l='0'):
     logging.debug('out:%s' % out)
     return out
 
-#
-# test = input('test') or '(1-2)×(2+3-(2-1))/4'
-# core(test)
 
-print(multiply.f([2,2]))
-a = sqroot.splt('√4')
-print(a)
-for i in a:
-    print(sqroot.f(i))
+test = input('test') or '(1-2)×(2+3-(2-1))/(√4)'
+core(test)
