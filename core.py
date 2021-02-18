@@ -17,26 +17,23 @@ def log(func):
 # ######################################################################################################################
 #
 # 你们怎么一个劲长个子
-#               ,___.、
-#             |||————||//|
-#             丨눈  눈 |||
-#              乀  -  丿
-#         ／            (((ヽ
-#        (　 ﾉ　　 　　 ￣Ｙ＼
-#        |　(＼　         ｜    )
-#         ヽ　ヽ`  _     ノ    /
-# 　         ＼ |　⌒Ｙ⌒　/  /
-# 　        ｜ヽ   · ｜  ·  ﾉ/
-#          　｜＼トー仝ーイ  /
-# 　　       ｜    ミ土彡  /
-#           ) \     °   /
-#          (   \   y     \
-#          /     /  \ \   \
-#        /  /   /      \
-#       ( (    ).       ) ).  )
-#      (      ).         ( |  |
-#       |    /            \   |
-#     nn.   ).             （. nn.
+#              ,,___.、
+#         ／   ||———|/||(((ヽ
+#        (　 ﾉ　丨눈  눈| ￣Ｙ＼
+#        |　(＼　乀 -  丿  ｜  )
+#         ヽ　ヽ`  _     ノ  /
+# 　        ＼ |　⌒Ｙ⌒　/  /
+# 　         ｜ヽ · ｜ ·  ﾉ/
+#           ｜＼トー仝ーイ /
+# 　　       ｜   ミ土彡  /
+#            )\    °   /
+#            (  \  y   \
+#           /    /   \ \\
+#          / /  /     \  \
+#         ( (  ).      ) ).)
+#        (    ).        (| |
+#        |   /           \ |
+#      nn.   ).          （. nn.
 
 
 class basicf(object):
@@ -68,8 +65,9 @@ class basicf(object):
             s = []
             symbol = symbollist[t]
             for i in splittedlist:
-                s += i.split(symbol)
-            splittedlist = s
+                if symbol in i:
+                    s += i.split(symbol)
+                    splittedlist = s
             t += 1
         return splittedlist
 
@@ -111,18 +109,27 @@ def brackets(l):
     logging.info('l:%s,start:%s,end:%s' % (l, start, end))
     if start + end >= 0:
         if '(' in l[end:] or '（' in l[end:]:
-            return core(l[: start] + core(l[start + 1: end]) + l[end + 1:])
+            return str(core(l[: start] + str(int(core(l[start + 1: end]))) + l[end + 1:]))
         else:
-            return l[: start] + core(l[start + 1: end]) + l[end + 1:]
+            return l[: start] + str(int(core(l[start + 1: end]))) + l[end + 1:]
     else:
         return str(l)
 
 
 @log
 def core(l='0'):
+    def onevariableq(x):
+        if '√' in x:
+            for tobsqrooted in sqroot.splt(x):
+                logging.debug('tobsqrooted:%s,type:%s' % (tobsqrooted, type(tobsqrooted)))
+                x = sqroot.f(tobsqrooted)
+        return x
+
     l = brackets(l)
     logging.info('brackets(l):%s' % l)
     ladd = []
+    if '**' in l:
+        l = '^'.join(l.split('**'))
     for tobadded in add.splt(l):
         logging.debug('tobadded:%s' % tobadded)
         ldoubleminus = []
@@ -137,10 +144,14 @@ def core(l='0'):
                     lmultiply = []
                     for tobmultiplied in multiply.splt(tobdivided):
                         logging.debug('tobmultiplied:%s' % tobmultiplied)
-                        if '√' in tobmultiplied:
-                            for tobsqrooted in sqroot.splt(tobmultiplied):
-                                tobmultiplied = sqroot.f(tobsqrooted)
-                        lmultiply.append(tobmultiplied)
+                        lpower = []
+                        for tobpowered in power.splt(tobmultiplied):
+                            logging.debug('tobpowered:%s' % tobpowered)
+                            tobpowered = onevariableq(tobpowered)
+                            logging.debug('sqrooted:%s' % tobpowered)
+                            lpower.append(tobpowered)
+                        logging.debug('lpower:%s' % lpower)
+                        lmultiply.append(power.f(lpower))
                     logging.debug('lmultiply:%s' % lmultiply)
                     ldivide.append(multiply.f(lmultiply))
                 logging.debug('ldivide:%s' % ldivide)
@@ -150,10 +161,11 @@ def core(l='0'):
         logging.debug('ldoubleminus:%s' % ldoubleminus)
         ladd.append(add.f(ldoubleminus))
     logging.debug('ladd:%s' % ladd)
-    out = str(add.f(ladd))
+    out = add.f(ladd)
     logging.debug('out:%s' % out)
     return out
 
+
 #
-# test = input('test') or '(1-2)×(2+3-(2-1))/(√4)'
+# test = input('test') or '(1-2**3)×(2+3-(2-1))/(√4)'
 # core(test)
