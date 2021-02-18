@@ -1,5 +1,6 @@
 import logging
 from functools import reduce, wraps
+from math import sin, cos, tan, asin, acos, atan
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -22,28 +23,46 @@ def log(func):
 #                乀  -  丿
 
 
-class method(object):
+class basicf(object):
 
-    def __init__(self, alg, a='a', b='b', quickalg=None):
+    def __init__(self, alg, symbol, a='a', b='b', quickalg=None):
         self.alg = quickalg or alg
         self.a = a
         self.b = b
+        self.symbol = symbol
 
     def f(self, l):
         return reduce(eval('lambda %s, %s: %s' % (self.a, self.b, self.alg)), [int(i) if bool(i) else 0 for i in l])
 
     def splt(self, l):
-        symbol = ''.join(self.alg.split(self.a))
-        symbol = ''.join(symbol.split(self.b))
-        lsplited = l.split(symbol)
-        for i in lsplited:
-            yield i
+        symbollist = self.symbol
+        n = len(symbollist)
+        t = 0
+        splittedlist = [l]
+        while t < n:
+            s = []
+            symbol = symbollist[t]
+            for i in splittedlist:
+                s += i.split(symbol)
+            splittedlist = s
+            t += 1
+        return splittedlist
 
 
-add = method('a+b')
-minus = method('a-b')
-multiply = method('a*b')
-divide = method('a/b')
+class trigf(object):
+
+    def __init__(self, alg, a='x'):
+        self.alg = alg
+        self.a = a
+
+    def f(self, l):
+        return
+
+
+add = basicf('a+b', ['+', '+'])
+minus = basicf('a-b', ['-', '-'])
+multiply = basicf('a*b', ['*', '×'])
+divide = basicf('a/b', ['/', '÷'])
 
 
 @log
@@ -78,23 +97,33 @@ def core(l='0'):
     logging.info('brackets(l):%s' % l)
     ladd = []
     for tobadded in add.splt(l):
+        logging.debug('tobadded:%s' % tobadded)
         ldoubleminus = []
         for tobdoubleminused in tobadded.split('--'):
+            logging.debug('tobdoubleminused:%s' % tobdoubleminused)
             lminus = []
             for tobminused in minus.splt(tobdoubleminused):
-                lmultiply = []
-                for tobmultiolied in multiply.splt(tobminused):
-                    ldivide = []
-                    for tobdivided in divide.splt(tobmultiolied):
-                        ldivide.append(tobdivided)
-                    lmultiply.append(divide.f(ldivide))
-                lminus.append(multiply.f(lmultiply))
+                logging.debug('tobminused:%s' % tobminused)
+                ldivide = []
+                for tobdivided in divide.splt(tobminused):
+                    logging.debug('tobdivided:%s' % tobdivided)
+                    lmultiply = []
+                    for tobmultiplied in multiply.splt(tobdivided):
+                        logging.debug('tobmultiplied:%s' % tobmultiplied)
+                        lmultiply.append(tobmultiplied)
+                    logging.debug('lmultiply:%s' % lmultiply)
+                    ldivide.append(multiply.f(lmultiply))
+                logging.debug('ldivide:%s' % ldivide)
+                lminus.append(divide.f(ldivide))
+            logging.debug('lminus:%s' % lminus)
             ldoubleminus.append(minus.f(lminus))
+        logging.debug('ldoubleminus:%s' % ldoubleminus)
         ladd.append(add.f(ldoubleminus))
+    logging.debug('ladd:%s' % ladd)
     out = str(add.f(ladd))
-    logging.info('out:%s' % out)
+    logging.debug('out:%s' % out)
     return out
 
 
-# test = input('test') or '(1-2)*(2+3-(2-1))/4'
-# core(test)
+test = input('test') or '(1-2)*(2+3-(2-1))/4'
+core(test)
