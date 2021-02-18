@@ -1,44 +1,42 @@
-import functools
 import logging
-from functools import reduce
+from functools import reduce, wraps
 
 logging.basicConfig(level=logging.DEBUG)
 
 
 def log(func):
-    @functools.wraps(func)
+    @wraps(func)
     def wrapper(*args, **kwargs):
         logging.debug('call %s(%s): ' % (func.__name__, args))
         return func(*args, **kwargs)
+
     return wrapper
 
 
-def add(l):
-    return sum([int(i) if bool(i) else 0 for i in l])
+# ################################################################################################################################################################################################################################
+#
+# 你们怎么一个劲长个子
+#                 ,___.、
+#               |||—————||//|
+#               丨눈   눈 |||
+#                乀   -  丿
 
 
-def minus_f(a=0, b=0):
-    return a - b
+class method(object):
+
+    def __init__(self, alg, a='a', b='b'):
+        self.alg = alg
+        self.a = a
+        self.b = b
+
+    def f(self, l):
+        return reduce(eval('lambda %s, %s: %s' % (self.a, self.b, self.alg)), [int(i) if bool(i) else 0 for i in l])
 
 
-def minus(l):
-    return reduce(minus_f, [int(i) if bool(i) else 0 for i in l])
-
-
-def multiply_f(a=0, b=0):
-    return a * b
-
-
-def multiply(l):
-    return reduce(minus_f, [int(i) for i in l])
-
-
-def divide_f(a, b):
-    return a / b
-
-
-def divide(l):
-    return reduce(divide_f, [int(i) for i in l])
+add = method('a+b')
+minus = method('a-b')
+multiply = method('a*b')
+divide = method('a/b')
 
 
 @log
@@ -77,14 +75,13 @@ def core(l):
         n2 = 0
         m = m.split(('--'))
         for s in m:
-            m[n2] = minus(s.split('-'))
+            m[n2] = minus.f(s.split('-'))
             n2 += 1
-        l[n1] = add(m)
+        l[n1] = add.f(m)
         n1 += 1
-    out = str(add(l))
+    out = str(add.f(l))
     logging.info('out:%s' % out)
     return out
 
-
-# test = input('test') or '0'
-# core(test)
+test = input('test') or '0'
+core(test)

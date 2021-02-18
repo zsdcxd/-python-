@@ -1,5 +1,5 @@
-import tkinter.messagebox as messagebox
 from tkinter import *
+
 import core
 
 
