@@ -20,7 +20,7 @@ def log(func):
 #                 ,___.、
 #               |||————||//|
 #               丨눈  눈 |||
-#                乀  -  丿
+#                乀  -  丿      ←wdq
 
 
 class basicf(object):
@@ -32,7 +32,11 @@ class basicf(object):
         self.symbol = symbol
 
     def f(self, l):
-        return reduce(eval('lambda %s, %s: %s' % (self.a, self.b, self.alg)), [int(i) if bool(i) else 0 for i in l])
+        variable = self.a
+        if self.b in self.alg:
+            variable += ','
+            variable += self.b
+        return reduce(eval('lambda %s: %s' % (variable, self.alg)), [int(i) if bool(i) else 0 for i in l])
 
     def splt(self, l):
         symbollist = self.symbol
@@ -56,14 +60,14 @@ class trigf(object):
         self.a = a
 
     def f(self, l):
-        return
+        pass
 
 
 add = basicf('a+b', ['+', '+'])
 minus = basicf('a-b', ['-', '-'])
 multiply = basicf('a*b', ['*', '×'])
 divide = basicf('a/b', ['/', '÷'])
-
+sqroot = basicf('a**0.5', ['√'])
 
 @log
 def brackets(l):
@@ -124,6 +128,12 @@ def core(l='0'):
     logging.debug('out:%s' % out)
     return out
 
+#
+# test = input('test') or '(1-2)×(2+3-(2-1))/4'
+# core(test)
 
-test = input('test') or '(1-2)*(2+3-(2-1))/4'
-core(test)
+print(multiply.f([2,2]))
+a = sqroot.splt('√4')
+print(a)
+for i in a:
+    print(sqroot.f(i))
