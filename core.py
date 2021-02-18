@@ -17,20 +17,27 @@ def log(func):
 #
 # 你们怎么一个劲长个子
 #                 ,___.、
-#               |||—————||//|
-#               丨눈   눈 |||
-#                乀   -  丿
+#               |||————||//|
+#               丨눈  눈 |||
+#                乀  -  丿
 
 
 class method(object):
 
-    def __init__(self, alg, a='a', b='b'):
-        self.alg = alg
+    def __init__(self, alg, a='a', b='b', quickalg=None):
+        self.alg = quickalg or alg
         self.a = a
         self.b = b
 
     def f(self, l):
         return reduce(eval('lambda %s, %s: %s' % (self.a, self.b, self.alg)), [int(i) if bool(i) else 0 for i in l])
+
+    def splt(self, l):
+        symbol = ''.join(self.alg.split(self.a))
+        symbol = ''.join(symbol.split(self.b))
+        lsplited = l.split(symbol)
+        for i in lsplited:
+            yield i
 
 
 add = method('a+b')
@@ -66,22 +73,19 @@ def brackets(l):
 
 
 @log
-def core(l):
+def core(l='0'):
     l = brackets(l)
     logging.info('brackets(l):%s' % l)
-    l = l.split('+')
-    n1 = 0
-    for m in l:
-        n2 = 0
-        m = m.split(('--'))
-        for s in m:
-            m[n2] = minus.f(s.split('-'))
-            n2 += 1
-        l[n1] = add.f(m)
-        n1 += 1
-    out = str(add.f(l))
+    ladd = []
+    for m in add.splt(l):
+        ldoubleminus = []
+        for s in m.split('--'):
+            ldoubleminus.append(minus.f(minus.splt(s)))
+        ladd.append(add.f(ldoubleminus))
+    out = str(add.f(ladd))
     logging.info('out:%s' % out)
     return out
-#
+
+
 # test = input('test') or '0'
 # core(test)
