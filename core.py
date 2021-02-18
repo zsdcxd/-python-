@@ -154,6 +154,6 @@ def core(l='0'):
     logging.debug('out:%s' % out)
     return out
 
-
-test = input('test') or '(1-2)×(2+3-(2-1))/(√4)'
-core(test)
+#
+# test = input('test') or '(1-2)×(2+3-(2-1))/(√4)'
+# core(test)
