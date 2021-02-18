@@ -82,6 +82,6 @@ def core(l):
     out = str(add.f(l))
     logging.info('out:%s' % out)
     return out
-
-test = input('test') or '0'
-core(test)
+#
+# test = input('test') or '0'
+# core(test)
