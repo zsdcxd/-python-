@@ -77,15 +77,24 @@ def core(l='0'):
     l = brackets(l)
     logging.info('brackets(l):%s' % l)
     ladd = []
-    for m in add.splt(l):
+    for tobadded in add.splt(l):
         ldoubleminus = []
-        for s in m.split('--'):
-            ldoubleminus.append(minus.f(minus.splt(s)))
+        for tobdoubleminused in tobadded.split('--'):
+            lminus = []
+            for tobminused in minus.splt(tobdoubleminused):
+                lmultiply = []
+                for tobmultiolied in multiply.splt(tobminused):
+                    ldivide = []
+                    for tobdivided in divide.splt(tobmultiolied):
+                        ldivide.append(tobdivided)
+                    lmultiply.append(divide.f(ldivide))
+                lminus.append(multiply.f(lmultiply))
+            ldoubleminus.append(minus.f(lminus))
         ladd.append(add.f(ldoubleminus))
     out = str(add.f(ladd))
     logging.info('out:%s' % out)
     return out
 
 
-# test = input('test') or '0'
+# test = input('test') or '(1-2)*(2+3-(2-1))/4'
 # core(test)
