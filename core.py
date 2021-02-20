@@ -81,9 +81,10 @@ class basicf(object):
         for symbol in self.symbol:
             if symbol in x:
                 for tobdone in self.splt(x):
-                    logging.debug('%s:%s,type:%s' % ('tob' + self.tobname, tobdone, type(tobdone)))
-                    x = self.f(tobdone)
-                    logging.debug('%s:%s' % (self.tobname, x))
+                    if bool(tobdone):
+                        logging.debug('%s:%s,type:%s' % ('tob' + self.tobname, tobdone, type(tobdone)))
+                        x = self.f(tobdone)
+                        logging.debug('%s:%s' % (self.tobname, x))
         return x
 
 
@@ -133,8 +134,13 @@ def brackets(l):
         return str(l)
 
 
+changevariableqtimes = 0
+
+
 @log
 def core(l='0'):
+    global changevariableqtimes
+
     def onevariableq(x):
         x = sqroot.onevariableq(x)
         x = sinc.onevariableq(x)
@@ -156,10 +162,18 @@ def core(l='0'):
             x = '^'.join(x.split('**'))
         if '--' in x:
             x = '+'.join(x.split('--'))
-
+        if '[' or ']' in x:
+            x = '('.join(x.split(('[')))
+            x = ')'.join((x.split(']')))
+        if '{' or '}' in x:
+            x = '('.join(x.split('{'))
+            x = ')'.join((x.split('}')))
+        logging.debug('chanded:%s' % (x))
         return x
 
-    l = changevariableq(l)
+    while changevariableqtimes == 0:
+        l = changevariableq(l)
+        changevariableqtimes += 1
     l = brackets(l)
     logging.info('brackets(l):%s' % l)
     ladd = []
