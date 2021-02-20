@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.DEBUG)
 def log(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        logging.debug('call %s(%s): ' % (func.__name__, args))
+        logging.debug('call %s%s: ' % (func.__name__, args))
         return func(*args, **kwargs)
 
     return wrapper
@@ -38,25 +38,31 @@ def log(func):
 
 class basicf(object):
 
-    def __init__(self, alg, symbol, times, a='a', b='b', quickalg=None):
+    def __init__(self, alg, symbol, times, a='a', b='b', quickalg=None, tobname = None):
         self.alg = quickalg or alg
         self.a = a
         self.b = b
         self.times = times
         self.symbol = symbol
+        self.tobname = tobname
 
     def f(self, l):
         variable = self.a
         if self.b in self.alg:
             variable += ','
             variable += self.b
-            return reduce(eval('lambda %s: %s' % (variable, self.alg)),
-                          [int(i) if bool(i) else self.times for i in l])
+            out = reduce(eval('lambda %s: %s' % (variable, self.alg)),
+                          [eval(i) if bool(i) else self.times for i in l])
+            return str(out)
         elif l:
-            out = list(
-                map(eval('lambda %s: %s' % (variable, self.alg)),
-                    [int(i) if bool(i) else self.times for i in l]))
-            return out[0]
+            f = eval('lambda %s: %s' % (variable, self.alg))
+            out = f(eval(l))
+            return str(out)
+            # l = [l]
+            # out = list(
+            #     map(eval('lambda %s: %s' % (variable, self.alg)),
+            #         [eval(i) if bool(i) else self.times for i in l]))
+            # return str(out[0])
 
     def splt(self, l):
         symbollist = self.symbol
@@ -71,20 +77,31 @@ class basicf(object):
                     s += i.split(symbol)
                     splittedlist = s
             t += 1
+        # while '' in splittedlist:
+        #     splittedlist.remove('')
         return splittedlist
+
+    def onevariableq(self, x):
+        for symbol in self.symbol:
+            if symbol in x:
+                for tobdone in self.splt(x):
+                    logging.debug('%s:%s,type:%s' % ('tob'+self.tobname, tobdone, type(tobdone)))
+                    x = self.f(tobdone)
+                    logging.debug('%s:%s' % (self.tobname, x))
+        return x
 
 
 add = basicf('a+b', ['+', '+'], 0)
 minus = basicf('a-b', ['-', '-'], 0)
 multiply = basicf('a*b', ['*', '×'], 0)
 divide = basicf('a/b', ['/', '÷'], 0)
-sqroot = basicf('a**0.5', ['√'], 0)
+sqroot = basicf('a**0.5', ['√'], 0, tobname='sqrooted')
 power = basicf('a**b', ['**', '^'], 0)
-sinc = basicf('sina', ['sin'], 0)
-cosc = basicf('cosa', ['cos'], 0)
-tanc = basicf('tana', ['tan'], 0)
+sinc = basicf('sin(a)', ['sin'], 0, tobname='sined')
+cosc = basicf('cos(a)', ['cos'], 0, tobname='cosed')
+tanc = basicf('tan(a)', ['tan'], 0, tobname='taned')
 
-print(sinc.f([pi/2]))
+
 @log
 def brackets(l):
     start = min(l.find('(') if l.find('(') != -1 and l.find('（') != -1 else max(l.find('('), l.find('（')),
@@ -101,12 +118,12 @@ def brackets(l):
                 end = n
                 break
         n += 1
-    logging.info('l:%s,start:%s,end:%s' % (l, start, end))
+    logging.debug('l:%s,start:%s,end:%s' % (l, start, end))
     if start + end >= 0:
         if '(' in l[end:] or '（' in l[end:]:
-            return str(core(l[: start] + str(int(core(l[start + 1: end]))) + l[end + 1:]))
+            return str(core(l[: start] + str(eval(core(l[start + 1: end]))) + l[end + 1:]))
         else:
-            return l[: start] + str(int(core(l[start + 1: end]))) + l[end + 1:]
+            return l[: start] + str(eval(core(l[start + 1: end]))) + l[end + 1:]
     else:
         return str(l)
 
@@ -114,52 +131,52 @@ def brackets(l):
 @log
 def core(l='0'):
     def onevariableq(x):
-        if '√' in x:
-            for tobsqrooted in sqroot.splt(x):
-                logging.debug('tobsqrooted:%s,type:%s' % (tobsqrooted, type(tobsqrooted)))
-                x = sqroot.f(tobsqrooted)
+        x = sqroot.onevariableq(x)
+        x = sinc.onevariableq(x)
+        x = cosc.onevariableq(x)
+        x = tanc.onevariableq(x)
         return x
 
+    def changevariableq(x):
+        if '**' in x:
+            x = '^'.join(x.split('**'))
+        if '--' in x:
+            x = '+'.join(x.split(('--')))
+
+        return x
+    l = changevariableq(l)
     l = brackets(l)
     logging.info('brackets(l):%s' % l)
     ladd = []
-    if '**' in l:
-        l = '^'.join(l.split('**'))
     for tobadded in add.splt(l):
         logging.debug('tobadded:%s' % tobadded)
-        ldoubleminus = []
-        for tobdoubleminused in tobadded.split('--'):
-            logging.debug('tobdoubleminused:%s' % tobdoubleminused)
-            lminus = []
-            for tobminused in minus.splt(tobdoubleminused):
-                logging.debug('tobminused:%s' % tobminused)
-                ldivide = []
-                for tobdivided in divide.splt(tobminused):
-                    logging.debug('tobdivided:%s' % tobdivided)
-                    lmultiply = []
-                    for tobmultiplied in multiply.splt(tobdivided):
-                        logging.debug('tobmultiplied:%s' % tobmultiplied)
-                        lpower = []
-                        for tobpowered in power.splt(tobmultiplied):
-                            logging.debug('tobpowered:%s' % tobpowered)
-                            tobpowered = onevariableq(tobpowered)
-                            logging.debug('sqrooted:%s' % tobpowered)
-                            lpower.append(tobpowered)
-                        logging.debug('lpower:%s' % lpower)
-                        lmultiply.append(power.f(lpower))
-                    logging.debug('lmultiply:%s' % lmultiply)
-                    ldivide.append(multiply.f(lmultiply))
-                logging.debug('ldivide:%s' % ldivide)
-                lminus.append(divide.f(ldivide))
-            logging.debug('lminus:%s' % lminus)
-            ldoubleminus.append(minus.f(lminus))
-        logging.debug('ldoubleminus:%s' % ldoubleminus)
-        ladd.append(add.f(ldoubleminus))
+        lminus = []
+        for tobminused in minus.splt(tobadded):
+            logging.debug('tobminused:%s' % tobminused)
+            ldivide = []
+            for tobdivided in divide.splt(tobminused):
+                logging.debug('tobdivided:%s' % tobdivided)
+                lmultiply = []
+                for tobmultiplied in multiply.splt(tobdivided):
+                    logging.debug('tobmultiplied:%s' % tobmultiplied)
+                    lpower = []
+                    for tobpowered in power.splt(tobmultiplied):
+                        logging.debug('tobpowered:%s' % tobpowered)
+                        tobpowered = onevariableq(tobpowered)
+                        lpower.append(tobpowered)
+                    logging.debug('lpower:%s' % lpower)
+                    lmultiply.append(power.f(lpower))
+                logging.debug('lmultiply:%s' % lmultiply)
+                ldivide.append(multiply.f(lmultiply))
+            logging.debug('ldivide:%s' % ldivide)
+            lminus.append(divide.f(ldivide))
+        logging.debug('lminus:%s' % lminus)
+        ladd.append(minus.f(lminus))
     logging.debug('ladd:%s' % ladd)
     out = add.f(ladd)
     logging.debug('out:%s' % out)
     return out
 
-#
-# test = input('test') or '(1-2**3)×(2+3-(2*sin(pi())-1))/(√4)'
-# core(test)
+
+test = input('test') or '0'
+core(test)
