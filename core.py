@@ -1,6 +1,6 @@
 import logging
 from functools import reduce, wraps
-from math import sin, cos, tan, asin, acos, atan, pi
+from math import sin, cos, tan, asin, acos, atan, pi, sinh, cosh, tanh, asinh, acosh, atanh
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -38,31 +38,27 @@ def log(func):
 
 class basicf(object):
 
-    def __init__(self, alg, symbol, times, a='a', b='b', quickalg=None, tobname = None):
-        self.alg = quickalg or alg
-        self.a = a
-        self.b = b
+    def __init__(self, alg, symbol, times=0, tobname=None):
+        if '(' in alg:
+            variable = alg.split('(')[1].split(')')[0]
+        else:
+            variable = ','.join(alg.split(symbol[0]))
+        self.alg = alg
+        self.variable = variable
         self.times = times
         self.symbol = symbol
         self.tobname = tobname
 
     def f(self, l):
-        variable = self.a
-        if self.b in self.alg:
-            variable += ','
-            variable += self.b
+        variable = self.variable
+        if not self.tobname:
             out = reduce(eval('lambda %s: %s' % (variable, self.alg)),
-                          [eval(i) if bool(i) else self.times for i in l])
+                         [eval(i) if bool(i) else self.times for i in l])
             return str(out)
-        elif l:
+        else:
             f = eval('lambda %s: %s' % (variable, self.alg))
             out = f(eval(l))
             return str(out)
-            # l = [l]
-            # out = list(
-            #     map(eval('lambda %s: %s' % (variable, self.alg)),
-            #         [eval(i) if bool(i) else self.times for i in l]))
-            # return str(out[0])
 
     def splt(self, l):
         symbollist = self.symbol
@@ -85,21 +81,30 @@ class basicf(object):
         for symbol in self.symbol:
             if symbol in x:
                 for tobdone in self.splt(x):
-                    logging.debug('%s:%s,type:%s' % ('tob'+self.tobname, tobdone, type(tobdone)))
+                    logging.debug('%s:%s,type:%s' % ('tob' + self.tobname, tobdone, type(tobdone)))
                     x = self.f(tobdone)
                     logging.debug('%s:%s' % (self.tobname, x))
         return x
 
 
-add = basicf('a+b', ['+', '+'], 0)
-minus = basicf('a-b', ['-', '-'], 0)
-multiply = basicf('a*b', ['*', '×'], 0)
-divide = basicf('a/b', ['/', '÷'], 0)
-sqroot = basicf('a**0.5', ['√'], 0, tobname='sqrooted')
-power = basicf('a**b', ['**', '^'], 0)
-sinc = basicf('sin(a)', ['sin'], 0, tobname='sined')
-cosc = basicf('cos(a)', ['cos'], 0, tobname='cosed')
-tanc = basicf('tan(a)', ['tan'], 0, tobname='taned')
+add = basicf('a+b', ['+', '+'])
+minus = basicf('a-b', ['-', '-'])
+multiply = basicf('a*b', ['*', '×'])
+divide = basicf('a/b', ['/', '÷'])
+sqroot = basicf('a**0.5', ['√'], tobname='sqrooted')
+power = basicf('a**b', ['**', '^'])
+sinc = basicf('sin(a)', ['sin'], tobname='sined')
+cosc = basicf('cos(a)', ['cos'], tobname='cosed')
+tanc = basicf('tan(a)', ['tan'], tobname='taned')
+asinc = basicf('asin(a)', ['asin', 'arcsin'], tobname='arcsined')
+acosc = basicf('acos(a)', ['acos', 'arccos', 'arcos'], tobname='arccosed')
+atanc = basicf('atan(a)', ['atan', 'arctan'], tobname='arctaned')
+sinhc = basicf('sinh(a)', ['sinh'], tobname='sinhed')
+coshc = basicf('cosh(a)', ['cosh'], tobname='coshed')
+tanhc = basicf('tanh(a)', ['tanh'], tobname='tanhed')
+asinhc = basicf('asinh(a)', ['asinh', 'arcsinh'], tobname='arcsinhed')
+acoshc = basicf('acosh(a)', ['acosh', 'arccosh', 'arcosh'], tobname='arccoshed')
+atanhc = basicf('atanh(a)', ['atanh', 'arctanh'], tobname='arctanhed')
 
 
 @log
@@ -135,15 +140,25 @@ def core(l='0'):
         x = sinc.onevariableq(x)
         x = cosc.onevariableq(x)
         x = tanc.onevariableq(x)
+        x = asinc.onevariableq(x)
+        x = acosc.onevariableq(x)
+        x = atanc.onevariableq(x)
+        x = sinhc.onevariableq(x)
+        x = coshc.onevariableq(x)
+        x = tanhc.onevariableq(x)
+        x = asinhc.onevariableq(x)
+        x = acoshc.onevariableq(x)
+        x = atanhc.onevariableq(x)
         return x
 
     def changevariableq(x):
         if '**' in x:
             x = '^'.join(x.split('**'))
         if '--' in x:
-            x = '+'.join(x.split(('--')))
+            x = '+'.join(x.split('--'))
 
         return x
+
     l = changevariableq(l)
     l = brackets(l)
     logging.info('brackets(l):%s' % l)
