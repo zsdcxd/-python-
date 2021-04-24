@@ -17,7 +17,7 @@ def log(func):
 # ######################################################################################################################
 #
 # 你们怎么一个劲长个子
-#              ,,___.、
+#              ,,____.、
 #         ／   ||———|/||(((ヽ
 #        (　 ﾉ　丨눈  눈| ￣Ｙ＼
 #        |　(＼　乀 -  丿  ｜  )
@@ -207,5 +207,11 @@ def core(l='0'):
     return out
 
 
-test = input('test') or '0'
-core(test)
+def inf(l):
+    return l + '=' + core(l)
+
+
+# test = input('test') or '0'
+# output = core(test)
+# bug = inf(test)
+# print('output=%s,bug=%s' % (output, bug))
